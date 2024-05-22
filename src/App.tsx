@@ -1,24 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useRef, useState } from "react";
 
 function App() {
+  const [list, setList] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setList((prev) => [...prev, ...Array.from({ length: 10 }, (_, i) => prev.length + i + 1)]);
+      }
+    });
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [ref]);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ul style={{ height: "100px", overflow: "scroll" }}>
+        {list.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+        <div ref={ref}>observe</div>
+      </ul>
     </div>
   );
 }
